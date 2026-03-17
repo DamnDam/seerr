@@ -257,6 +257,7 @@ CoreApp.getInitialProps = async (initialProps) => {
     newPlexLogin: true,
     youtubeUrl: '',
     plexClientIdentifier: '',
+    openIdProviders: [],
   };
 
   if (ctx.res) {
