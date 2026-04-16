@@ -11,12 +11,27 @@ COPY . ./app
 WORKDIR /app
 
 FROM base AS prod-deps
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store CI=true pnpm install --prod --frozen-lockfile
+
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store CI=true pnpm install --prod --frozen-lockfile --
+
+RUN du -shL ./node_modules/.pnpm/* | grep '[0-9]M.*' | grep 'linux-x64-gnu@' | awk '{print $2}' | xargs rm -rf
+RUN if [ -d node_modules/.pnpm ]; then \
+  find node_modules/.pnpm -type d \( \
+  -path "*ace-builds/src-noconflict" -o \
+  -path "*ace-builds/src" -o \
+  -path "*ace-builds/src-min" -o \
+  -path "*country-flag-icons/react" -o \
+  -path "*country-flag-icons/string" -o \
+  -path "*country-flag-icons/1x1" -o \
+  -path "*@heroicons/react/16" \
+  \) -exec rm -rf {} + || true; \
+  fi
+# -path "*country-flag-icons/modules" -o \
 
 FROM base AS build
 
 ARG COMMIT_TAG
-ENV COMMIT_TAG=${COMMIT_TAG}
+ENV COMMIT_TAG=${COMMIT_TAG:-develop}
 
 RUN \
   case "${TARGETPLATFORM}" in \
