@@ -1010,7 +1010,30 @@ authRoutes.post(
     if (req.session) {
       req.session.userId = user.id;
     }
-
+    
+    // Set logged in session and return
+    if (req.session) {
+      req.session.userId = user.id;
+    
+      // Explicitly save session before sending response to ensure
+      // the Set-Cookie header is included in the 204 response
+      return req.session.save((err) => {
+        if (err) {
+          logger.error('Failed to save session after OIDC login', {
+            label: 'Auth',
+            provider: provider.slug,
+            ip: req.ip,
+            error: err instanceof Error ? err.message : 'Unknown error',
+          });
+          return next({
+            status: 500,
+            error: ApiErrorCode.OidcAuthorizationFailed,
+          });
+        }
+        // Success!
+        return res.sendStatus(204);
+      });
+    }
     // Success!
     return res.sendStatus(204);
   }
