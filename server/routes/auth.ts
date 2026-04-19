@@ -1009,12 +1009,7 @@ authRoutes.post(
     // Set logged in session and return
     if (req.session) {
       req.session.userId = user.id;
-    }
-    
-    // Set logged in session and return
-    if (req.session) {
-      req.session.userId = user.id;
-    
+
       // Explicitly save session before sending response to ensure
       // the Set-Cookie header is included in the 204 response
       return req.session.save((err) => {

@@ -34,7 +34,7 @@ let app: Express;
 function createApp() {
   const app = express();
   app.use(express.json());
-  app.use(cookieParser('SECRET'));
+  app.use(cookieParser('test-secret'));
   app.use(
     session({
       secret: 'test-secret',
